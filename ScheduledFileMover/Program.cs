@@ -19,6 +19,7 @@ namespace ScheduledFileMover
 
                 foreach (string file in files)
                 {
+                    // This does not recursively copy subfolders and their respective files
                     string fileName = System.IO.Path.GetFileName(file);
                     string destFile = System.IO.Path.Combine(destinationFolder, fileName);
                     System.IO.File.Copy(file, destFile, true);
@@ -27,7 +28,6 @@ namespace ScheduledFileMover
             }
             else
             {
-                //
             }
 
         }

@@ -16,7 +16,7 @@ namespace ScheduledFileMover
 
             string aPath = Path.GetDirectoryName(Application.ExecutablePath);
             
-            string configPath = aPath + @"\ScheduledFileMoverPreferences.xml";
+            string configPath = aPath + @"\Preferences.xml";
             string logPath = aPath + @"\Log.txt";
             PathData pd = new PathData();
             

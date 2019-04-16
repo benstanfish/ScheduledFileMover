@@ -74,14 +74,14 @@ namespace ScheduledFileMover
                     }
                     catch (Exception e)
                     {
-                        stream.WriteLine("An error occured:");
+                        stream.WriteLine("An error occured within the inner try-catch. Error information:");
                         stream.WriteLine(e.ToString());
                     }
                     
                 }
                 catch (Exception e)
                 {
-                    stream.WriteLine("An error occured:");
+                    stream.WriteLine("An error occured within the outer try-catch. Error information:");
                     stream.WriteLine(e.ToString());
                 }
                 stream.Close();

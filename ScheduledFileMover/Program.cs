@@ -13,19 +13,38 @@ namespace ScheduledFileMover
         static void Main()
         {
 
-           
-            
-
-
-            string sourceFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Current Models\";
-            string destinationFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Previous Models\";
-            string logPath = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Copy_Activity_Log.txt";
-
+            string configPath = @"C:\Users\benst\Desktop\ScheduledFileMoverPreferences.xml";
             PathData pd = new PathData();
-            pd.SourceFolderPath = sourceFolder;
-            pd.TargetFolderPath = destinationFolder;
-            pd.SavePathData(@"D:\PathDataLog.txt");
+            if (!File.Exists(configPath))
+            {
+                pd.SourceFolderPath = @"Enter a source folder path here\";
+                pd.TargetFolderPath = @"Enter a destination folder path here\";
+                pd.SavePathData(configPath);
+                
+            }
+            else
+            {
+                Console.WriteLine("Logic B");
+                Console.ReadLine();
+            }
+
+
+            // string sourceFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Current Models\";
+            // string destinationFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Previous Models\";
+            // string logPath = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Copy_Activity_Log.txt";
+
             
+            // pd.SourceFolderPath = sourceFolder;
+            // pd.TargetFolderPath = destinationFolder;
+            // pd.SavePathData(@"D:\PathDataLog.txt");
+            pd.ReloadPathData(@"C:\Users\benst\Desktop\XML_Preferences");
+
+            string sourceFolder = pd.SourceFolderPath;
+            string destinationFolder = pd.TargetFolderPath;
+            string logPath = @"C:\Users\benst\Desktop\Log.txt";
+
+            Console.WriteLine(sourceFolder.ToString());
+            Console.WriteLine(destinationFolder.ToString());
 
             StreamWriter stream = new StreamWriter(logPath, true);
             string logTimeStamp = "Scheduled task executed at: " + DateTime.Now.ToString("HH:mm:ss, MMMM dd, yyyy");
@@ -89,19 +108,25 @@ namespace ScheduledFileMover
 
         public void SavePathData(string filePath)
         {
-            string fileName = @"C:\Users\benst\Desktop\XML_Preferences";
-            using (FileStream stream = new FileStream(fileName, FileMode.Create))
+            using (FileStream stream = new FileStream(filePath, FileMode.OpenOrCreate))
             {
                 XmlSerializer xml = new XmlSerializer(typeof(PathData));
                 TextWriter writer = new StreamWriter(filePath);
-
                 xml.Serialize(stream, this);
             }
         }
 
-        public void ReloadPathData()
-        {
 
+        public void ReloadPathData(string filePath)
+        {
+            using (FileStream stream = new FileStream(filePath, FileMode.Open))
+            {
+                PathData APathData = new PathData();
+                XmlSerializer xml = new XmlSerializer(typeof(PathData));
+                APathData = (PathData)xml.Deserialize(stream);
+                this.SourceFolderPath = APathData.SourceFolderPath;
+                this.TargetFolderPath = APathData.TargetFolderPath;
+            }
         }
 
     }

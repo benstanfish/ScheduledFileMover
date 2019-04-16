@@ -15,19 +15,15 @@ namespace ScheduledFileMover
 
             string configPath = @"C:\Users\benst\Desktop\ScheduledFileMoverPreferences.xml";
             PathData pd = new PathData();
+            
             if (!File.Exists(configPath))
             {
-                pd.SourceFolderPath = @"Enter a source folder path here\";
-                pd.TargetFolderPath = @"Enter a destination folder path here\";
-                pd.SavePathData(configPath);
-                
+                CreateNewPreferencesFile(configPath);
             }
             else
             {
-                Console.WriteLine("Logic B");
-                Console.ReadLine();
+                pd.ReloadPathData(configPath);
             }
-
 
             // string sourceFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Current Models\";
             // string destinationFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Previous Models\";
@@ -37,7 +33,7 @@ namespace ScheduledFileMover
             // pd.SourceFolderPath = sourceFolder;
             // pd.TargetFolderPath = destinationFolder;
             // pd.SavePathData(@"D:\PathDataLog.txt");
-            pd.ReloadPathData(@"C:\Users\benst\Desktop\XML_Preferences");
+            // pd.ReloadPathData(@"C:\Users\benst\Desktop\XML_Preferences");
 
             string sourceFolder = pd.SourceFolderPath;
             string destinationFolder = pd.TargetFolderPath;
@@ -51,6 +47,7 @@ namespace ScheduledFileMover
             stream.WriteLine("----------------------------------------------------------------------------------");
             stream.Write(logTimeStamp);
             stream.WriteLine();
+
             try
             {
 
@@ -94,7 +91,18 @@ namespace ScheduledFileMover
         }
 
 
-        
+        static void CreateNewPreferencesFile(string configPath)
+        {
+            PathData newConfig = new PathData();
+            newConfig.SourceFolderPath = @"Insert full source folder path here\";
+            newConfig.TargetFolderPath = @"Insert full destination folder path here\";
+
+            using (FileStream stream = new FileStream(configPath, FileMode.Create))
+            {
+                XmlSerializer xml = new XmlSerializer(typeof(PathData));
+                xml.Serialize(stream, newConfig);
+            }
+        }
 
 
 
@@ -105,17 +113,6 @@ namespace ScheduledFileMover
     {
         public string SourceFolderPath { get; set; }
         public string TargetFolderPath { get; set; }
-
-        public void SavePathData(string filePath)
-        {
-            using (FileStream stream = new FileStream(filePath, FileMode.OpenOrCreate))
-            {
-                XmlSerializer xml = new XmlSerializer(typeof(PathData));
-                TextWriter writer = new StreamWriter(filePath);
-                xml.Serialize(stream, this);
-            }
-        }
-
 
         public void ReloadPathData(string filePath)
         {

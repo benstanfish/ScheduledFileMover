@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Xml.Serialization;
+using System.Windows.Forms;
 
 namespace ScheduledFileMover
 {
@@ -13,7 +14,10 @@ namespace ScheduledFileMover
         static void Main()
         {
 
-            string configPath = @"C:\Users\benst\Desktop\ScheduledFileMoverPreferences.xml";
+            string aPath = Path.GetDirectoryName(Application.ExecutablePath);
+            
+            string configPath = aPath + @"\ScheduledFileMoverPreferences.xml";
+            string logPath = aPath + @"\Log.txt";
             PathData pd = new PathData();
             
             if (!File.Exists(configPath))
@@ -22,72 +26,78 @@ namespace ScheduledFileMover
             }
             else
             {
-                pd.ReloadPathData(configPath);
-            }
+                StreamWriter stream = new StreamWriter(logPath, true);
+                try
+                {
+                    pd.ReloadPathData(configPath);
+                    // string sourceFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Current Models\";
+                    // string destinationFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Previous Models\";
+                    // string logPath = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Copy_Activity_Log.txt";
 
-            // string sourceFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Current Models\";
-            // string destinationFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Previous Models\";
-            // string logPath = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Copy_Activity_Log.txt";
+
+                    // pd.SourceFolderPath = sourceFolder;
+                    // pd.TargetFolderPath = destinationFolder;
+                    // pd.SavePathData(@"D:\PathDataLog.txt");
+                    // pd.ReloadPathData(@"C:\Users\benst\Desktop\XML_Preferences");
+
+                    string sourceFolder = pd.SourceFolderPath;
+                    string destinationFolder = pd.TargetFolderPath;
+                    
+                    string logTimeStamp = "Scheduled task executed at: " + DateTime.Now.ToString("HH:mm:ss, MMMM dd, yyyy");
+                    stream.WriteLine("----------------------------------------------------------------------------------");
+                    stream.Write(logTimeStamp);
+                    stream.WriteLine();
+
+                    try
+                    {
+                        if (System.IO.Directory.Exists(sourceFolder))
+                        {
+                            string[] files = System.IO.Directory.GetFiles(sourceFolder);
+
+                            if (files.Length == 0)
+                            {
+                                stream.WriteLine("No files present in folder at time of scheduled task. Nothing copied.");
+                                stream.WriteLine();
+                            }
+                            else
+                            {
+                                stream.WriteLine("List of file(s) successfully moved:");
+                            }
+
+                            int i = 1;
+                            foreach (string file in files)
+                            {
+                                // This does not recursively copy subfolders and their respective files
+                                stream.Write("  " + i + ". " + file);
+                                string fileName = System.IO.Path.GetFileName(file);
+                                string destFile = System.IO.Path.Combine(destinationFolder, fileName);
+                                stream.WriteLine(" was moved to " + destFile);
+                                System.IO.File.Copy(file, destFile, true);
+                                System.IO.File.Delete(file);
+                                i++;
+                            }
+                        }
+                        else
+                        {
+                            stream.WriteLine("Source folder or files do not exist. Nothing moved.");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        stream.WriteLine("An error occured:");
+                        stream.WriteLine(e.ToString());
+                    }
+                    
+                }
+                catch (Exception e)
+                {
+                    stream.WriteLine("An error occured:");
+                    stream.WriteLine(e.ToString());
+                }
+                stream.Close();
+            }
 
             
-            // pd.SourceFolderPath = sourceFolder;
-            // pd.TargetFolderPath = destinationFolder;
-            // pd.SavePathData(@"D:\PathDataLog.txt");
-            // pd.ReloadPathData(@"C:\Users\benst\Desktop\XML_Preferences");
-
-            string sourceFolder = pd.SourceFolderPath;
-            string destinationFolder = pd.TargetFolderPath;
-            string logPath = @"C:\Users\benst\Desktop\Log.txt";
-
-            Console.WriteLine(sourceFolder.ToString());
-            Console.WriteLine(destinationFolder.ToString());
-
-            StreamWriter stream = new StreamWriter(logPath, true);
-            string logTimeStamp = "Scheduled task executed at: " + DateTime.Now.ToString("HH:mm:ss, MMMM dd, yyyy");
-            stream.WriteLine("----------------------------------------------------------------------------------");
-            stream.Write(logTimeStamp);
-            stream.WriteLine();
-
-            try
-            {
-
-                if (System.IO.Directory.Exists(sourceFolder))
-                {
-                    string[] files = System.IO.Directory.GetFiles(sourceFolder);
-                    
-                    if (files.Length == 0)
-                    {
-                        stream.WriteLine("No files present in folder at time of scheduled task. Nothing copied.");
-                        stream.WriteLine();
-                    }
-                    else
-                    {
-                        stream.WriteLine("List of file(s) successfully moved:");
-                    }
-
-                    int i = 1;
-                    foreach (string file in files)
-                    {
-                        // This does not recursively copy subfolders and their respective files
-                        stream.WriteLine("\t"+i+". "+file);
-                        string fileName = System.IO.Path.GetFileName(file);
-                        string destFile = System.IO.Path.Combine(destinationFolder, fileName);
-                        System.IO.File.Copy(file, destFile, true);
-                        System.IO.File.Delete(file);
-                        i++;
-                    }
-                }
-                else
-                {
-                    stream.WriteLine("Source folder or files do not exist. Nothing moved.");
-                }
-            }
-            catch (Exception e)
-            {
-                stream.WriteLine("An error occured:");
-                stream.WriteLine(e.ToString());
-            }
-            stream.Close();
         }
 
 

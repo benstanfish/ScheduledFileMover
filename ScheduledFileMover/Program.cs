@@ -30,16 +30,6 @@ namespace ScheduledFileMover
                 try
                 {
                     pd.ReloadPathData(configPath);
-                    // string sourceFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Current Models\";
-                    // string destinationFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Previous Models\";
-                    // string logPath = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Copy_Activity_Log.txt";
-
-
-                    // pd.SourceFolderPath = sourceFolder;
-                    // pd.TargetFolderPath = destinationFolder;
-                    // pd.SavePathData(@"D:\PathDataLog.txt");
-                    // pd.ReloadPathData(@"C:\Users\benst\Desktop\XML_Preferences");
-
                     string sourceFolder = pd.SourceFolderPath;
                     string destinationFolder = pd.TargetFolderPath;
                     
@@ -104,8 +94,8 @@ namespace ScheduledFileMover
         static void CreateNewPreferencesFile(string configPath)
         {
             PathData newConfig = new PathData();
-            newConfig.SourceFolderPath = @"Insert full source folder path here\";
-            newConfig.TargetFolderPath = @"Insert full destination folder path here\";
+            newConfig.SourceFolderPath = @"Insert full source folder path here";
+            newConfig.TargetFolderPath = @"Insert full destination folder path here";
 
             using (FileStream stream = new FileStream(configPath, FileMode.Create))
             {
@@ -113,9 +103,6 @@ namespace ScheduledFileMover
                 xml.Serialize(stream, newConfig);
             }
         }
-
-
-
     }
 
     [Serializable]

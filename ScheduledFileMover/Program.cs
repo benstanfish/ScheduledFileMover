@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Xml.Serialization;
 
 namespace ScheduledFileMover
 {
@@ -11,9 +12,20 @@ namespace ScheduledFileMover
     {
         static void Main()
         {
+
+           
+            
+
+
             string sourceFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Current Models\";
             string destinationFolder = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Previous Models\";
             string logPath = @"\\abam.com\Projects\FederalWay\2018\A18.0203\02\BIM\Collaboration\Copy_Activity_Log.txt";
+
+            PathData pd = new PathData();
+            pd.SourceFolderPath = sourceFolder;
+            pd.TargetFolderPath = destinationFolder;
+            pd.SavePathData(@"D:\PathDataLog.txt");
+            
 
             StreamWriter stream = new StreamWriter(logPath, true);
             string logTimeStamp = "Scheduled task executed at: " + DateTime.Now.ToString("HH:mm:ss, MMMM dd, yyyy");
@@ -61,5 +73,36 @@ namespace ScheduledFileMover
             }
             stream.Close();
         }
+
+
+        
+
+
+
+    }
+
+    [Serializable]
+    public class PathData
+    {
+        public string SourceFolderPath { get; set; }
+        public string TargetFolderPath { get; set; }
+
+        public void SavePathData(string filePath)
+        {
+            string fileName = @"C:\Users\benst\Desktop\XML_Preferences";
+            using (FileStream stream = new FileStream(fileName, FileMode.Create))
+            {
+                XmlSerializer xml = new XmlSerializer(typeof(PathData));
+                TextWriter writer = new StreamWriter(filePath);
+
+                xml.Serialize(stream, this);
+            }
+        }
+
+        public void ReloadPathData()
+        {
+
+        }
+
     }
 }
